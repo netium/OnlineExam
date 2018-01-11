@@ -1,11 +1,14 @@
 pipeline {
-    agent any
+    agent {
+        docker { image '3.5.2-jdk-8-alpine' }
+    }
 
     stages {
         stage('Build') {
             steps {
-                echo 'Building..'
+                sh 'mvn --version'
             }
+
         }
         stage('Test') {
             steps {
