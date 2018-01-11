@@ -3,6 +3,8 @@ package com.tiantianchiji.onlineexam.services;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tiantianchiji.onlineexam.dtos.Answer;
+import com.tiantianchiji.onlineexam.dtos.ExamReport;
+import com.tiantianchiji.onlineexam.dtos.QuestionFeedback;
 import com.tiantianchiji.onlineexam.entities.ExamEntity;
 import com.tiantianchiji.onlineexam.entities.ExamInstanceEntity;
 import com.tiantianchiji.onlineexam.entities.QuestionEntity;
@@ -12,6 +14,8 @@ import com.tiantianchiji.onlineexam.repositories.EndUserExamRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.time.Duration;
 import java.util.*;
 
 @Service
@@ -124,5 +128,71 @@ public class EndUserExamService {
         examInstanceRepository.save(instance);
 
         return 0;
+    }
+
+    public ExamReport getExamInstanceReport(String userToken, long examInstanceId) {
+        UserEntity userEntity = endUserService.getUserProfile(userToken);
+        if (userEntity == null)
+            return null;
+
+        ExamInstanceEntity instance = examInstanceRepository.findOne(examInstanceId);
+        if (instance == null)
+            return null;
+
+        if (instance.getUser().getId() != userEntity.getId())
+            return null;
+
+        if (instance.getStatus() != 1)
+            return null;
+
+        ExamEntity examEntity = instance.getExam();
+
+        List<QuestionEntity> questions = questionsService.getQuestionsForExam(examEntity);
+
+        ExamReport report = new ExamReport();
+        report.setId(instance.getId());
+        report.setName(examEntity.getName());
+        report.setDescription(examEntity.getDescription());
+        report.setTakenTime(instance.getStartTime());
+        report.setDuration("");
+        report.setPassScore(examEntity.getPassScore());
+        report.setScore(instance.getScore());
+        report.setPassed(instance.getScore() >= examEntity.getPassScore());
+
+
+        List<QuestionFeedback> questionFeedbacks = new ArrayList<QuestionFeedback>();
+
+        List<QuestionEntity> questionEntities = getQuestionsForExamInstance(userToken, examInstanceId);
+
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            Answer[] answers = mapper.readValue(instance.getAnswers(), Answer[].class);
+            for (QuestionEntity entity : questionEntities) {
+                QuestionFeedback feedback = new QuestionFeedback();
+                feedback.setId(entity.getId());
+                feedback.setContent(entity.getContent());
+                feedback.setCorrectAnswer(entity.getAnswer());
+                feedback.setPoints(entity.getPoints());
+                feedback.setFeedback(entity.getFeedback());
+                feedback.setActualAnswer("");
+                for (Answer answer : answers) {
+                    if(answer.getId() == entity.getId()) {
+                        feedback.setActualAnswer(answer.getAnswer());
+                        feedback.setIsCorrect(isAnswersMatched(answer.getAnswer(), entity.getAnswer()));
+                    }
+                }
+                questionFeedbacks.add(feedback);
+            }
+        }
+        catch (IOException e) {
+        }
+
+        report.setQuestionFeedback(questionFeedbacks);
+
+        return report;
+    }
+
+    private boolean isAnswersMatched(String answer1, String answer2) {
+        return answer1.toLowerCase().equals(answer2.toLowerCase());
     }
 }

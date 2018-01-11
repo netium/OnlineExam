@@ -9,6 +9,7 @@ public class QuestionFeedback {
     private String actualAnswer;
     private int points;
     private String feedback;
+    private boolean isCorrect;
 
     public long getId() {
         return id;
@@ -56,5 +57,13 @@ public class QuestionFeedback {
 
     public void setFeedback(String feedback) {
         this.feedback = feedback;
+    }
+
+    public boolean getIsCorrect() {
+        return isCorrect;
+    }
+
+    public void setIsCorrect(boolean isCorrect) {
+        this.isCorrect = isCorrect;
     }
 }

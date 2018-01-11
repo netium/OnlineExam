@@ -2,6 +2,7 @@ package com.tiantianchiji.onlineexam.controllers;
 
 import com.tiantianchiji.onlineexam.dtos.Answer;
 import com.tiantianchiji.onlineexam.dtos.AskFormQuestion;
+import com.tiantianchiji.onlineexam.dtos.ExamReport;
 import com.tiantianchiji.onlineexam.dtos.JsonResponse;
 import com.tiantianchiji.onlineexam.entities.ExamEntity;
 import com.tiantianchiji.onlineexam.entities.QuestionEntity;
@@ -32,8 +33,14 @@ public class EndUserExamController {
     }
 
     @RequestMapping(value="examinsts/{examinstid}", method = RequestMethod.GET)
-    public Object getExamReport(@RequestParam(value="userToken") String userToken, @PathVariable(value="examinstid") long examInstId) {
-        return null;
+    public JsonResponse<ExamReport> getExamReport(@RequestParam(value="userToken") String userToken, @PathVariable(value="examinstid") long examInstId) {
+        ExamReport report = _examService.getExamInstanceReport(userToken, examInstId);
+        if (report == null) {
+            return new JsonResponse<ExamReport>().fillStatus(HttpStatus.FORBIDDEN).fillMessage("").fillBody(null);
+        }
+        else {
+            return new JsonResponse<ExamReport>().fillStatus(HttpStatus.OK).fillMessage("").fillBody(report);
+        }
     }
 
     @RequestMapping(value="ongoingexams", method = RequestMethod.POST)

@@ -5,7 +5,7 @@ import java.time.Duration;
 import java.util.Date;
 import java.util.List;
 
-public class ExamFeedback implements Serializable {
+public class ExamReport implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private long id;
