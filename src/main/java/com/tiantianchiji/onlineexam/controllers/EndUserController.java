@@ -1,5 +1,6 @@
 package com.tiantianchiji.onlineexam.controllers;
 
+import com.tiantianchiji.onlineexam.dtos.JsonResponse;
 import com.tiantianchiji.onlineexam.dtos.UserProfile;
 import com.tiantianchiji.onlineexam.entities.UserEntity;
 import com.tiantianchiji.onlineexam.services.EndUserService;
@@ -15,12 +16,22 @@ public class EndUserController {
     EndUserService _service;
 
     @RequestMapping(value = "{id}", method = RequestMethod.GET)
-    public ResponseEntity<UserProfile> getUserProfile(@PathVariable Long id, @RequestParam(value = "userToken", defaultValue = "")String userToken) {
+    public JsonResponse<UserProfile> getUserProfile(@PathVariable Long id, @RequestParam(value = "userToken", defaultValue = "")String userToken) {
+        JsonResponse<UserProfile> response = new JsonResponse<>();
+        response.setStatus(HttpStatus.OK);
+        response.setMessage("");
         UserEntity user = _service.getUserProfile(userToken, id);
-        if (user == null)
-            return new ResponseEntity<UserProfile>((UserProfile)null, HttpStatus.UNAUTHORIZED);
-        else
-            return new ResponseEntity<UserProfile>(UserProfile.fromEntity(user), HttpStatus.OK);
+        if (user == null) {
+            response.setStatus(HttpStatus.NOT_FOUND);
+            response.setMessage("UserId: " + id.toString() + "was not found");
+            response.setBody(null);
+        }
+        else {
+            response.setStatus(HttpStatus.OK);
+            response.setMessage("");
+            response.setBody(UserProfile.fromEntity(user));
+        }
+        return response;
     }
 
     @RequestMapping(method = RequestMethod.POST)

@@ -1,14 +1,15 @@
 package com.tiantianchiji.onlineexam.controllers;
 
 import com.tiantianchiji.onlineexam.dtos.Exam;
-import com.tiantianchiji.onlineexam.dtos.ExamInfo;
-import com.tiantianchiji.onlineexam.dtos.Question;
+import com.tiantianchiji.onlineexam.dtos.JsonResponse;
+import com.tiantianchiji.onlineexam.entities.ExamEntity;
 import com.tiantianchiji.onlineexam.services.EndUserExamService;
 import com.tiantianchiji.onlineexam.services.EndUserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequestMapping("/users")
@@ -20,19 +21,18 @@ public class EndUserExamController {
     EndUserService _userService;
 
     @RequestMapping(value="{userid}/exams", method = RequestMethod.GET)
-    public Exam getExam(@PathVariable long userid, @RequestParam(value="userToken") String userToken) {
-        ExamInfo examInfo = null; // new ExamInfo(1, "English Level 4", "English level 4 exam", "Bo Zhou", 10, 60, 100 );
+    public JsonResponse<List<ExamEntity>> getApplicableExams(@PathVariable long userid, @RequestParam(value="userToken") String userToken) {
 
-        Exam exam = new Exam();
-        exam.setExamInfo(examInfo);
-
-        ArrayList<Question> questions = new ArrayList<> ();
-
-        return exam;
+        JsonResponse<List<ExamEntity>> response = new JsonResponse<List<ExamEntity>>();
+        response.setStatus(HttpStatus.OK);
+        response.setMessage("");
+        List<ExamEntity> exams = _examService.getAllApplicableExams(userToken);
+        response.setBody(exams);
+        return response;
     }
 
     @RequestMapping(value="{userid}/examinsts", method = RequestMethod.GET)
-    public Object getAllExams(@PathVariable long userid, @RequestParam(value="userToken") String userToken) {
+    public Object getAllExamInstances(@PathVariable long userid, @RequestParam(value="userToken") String userToken) {
         return null;
     }
 
