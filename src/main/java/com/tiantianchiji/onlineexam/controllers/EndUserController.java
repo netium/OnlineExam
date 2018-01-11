@@ -1,6 +1,7 @@
 package com.tiantianchiji.onlineexam.controllers;
 
 import com.tiantianchiji.onlineexam.dtos.JsonResponse;
+import com.tiantianchiji.onlineexam.dtos.UserCredential;
 import com.tiantianchiji.onlineexam.dtos.UserProfile;
 import com.tiantianchiji.onlineexam.entities.UserEntity;
 import com.tiantianchiji.onlineexam.services.EndUserService;
@@ -34,14 +35,14 @@ public class EndUserController {
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public long createUser(@RequestParam(value="username")String username, @RequestParam(value="password")String password) {
-        long id = _service.createUser(username, password);
+    public long createUser(@RequestBody UserCredential userCredential) {
+        long id = _service.createUser(userCredential.getUsername(), userCredential.getPassword());
         return id;
     }
 
     @RequestMapping(value = "login", method = RequestMethod.POST)
-    public JsonResponse<String> login(@RequestParam(value="username")String username, @RequestParam(value="password")String password) {
-        String token = _service.login(username, password);
+    public JsonResponse<String> login(@RequestBody UserCredential userCredential) {
+        String token = _service.login(userCredential.getUsername(), userCredential.getPassword());
         if (token == null || token.length() == 0) {
             return new JsonResponse<String>().fillStatus(HttpStatus.FORBIDDEN).fillMessage("Login failed!").fillBody("");
         }
