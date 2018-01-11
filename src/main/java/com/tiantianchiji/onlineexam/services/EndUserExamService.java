@@ -1,7 +1,9 @@
 package com.tiantianchiji.onlineexam.services;
 
+import com.tiantianchiji.onlineexam.dtos.Question;
 import com.tiantianchiji.onlineexam.entities.ExamEntity;
 import com.tiantianchiji.onlineexam.entities.ExamInstanceEntity;
+import com.tiantianchiji.onlineexam.entities.QuestionEntity;
 import com.tiantianchiji.onlineexam.entities.UserEntity;
 import com.tiantianchiji.onlineexam.repositories.EndUserExamInstanceRepository;
 import com.tiantianchiji.onlineexam.repositories.EndUserExamRepository;
@@ -18,6 +20,9 @@ public class EndUserExamService {
 
     @Autowired
     EndUserExamInstanceRepository examInstanceRepository;
+
+    @Autowired
+    QuestionsService questionsService;
 
     @Autowired
     EndUserService endUserService;
@@ -39,7 +44,7 @@ public class EndUserExamService {
             return -1;
 
         ExamEntity exam = examRepository.findOne(examId);
-        if (exam.getStatus() != 0) {
+        if (exam.getStatus() != 5) {
             return -1;
         }
 
@@ -55,5 +60,21 @@ public class EndUserExamService {
 
         instance = examInstanceRepository.save(instance);
         return instance.getId();
+    }
+
+    public List<QuestionEntity> getQuestionsForExamInstance(String userToken, long examInstanceId) {
+        UserEntity userEntity = endUserService.getUserProfile(userToken);
+
+        ExamInstanceEntity instance = examInstanceRepository.findOne(examInstanceId);
+        if (instance == null)
+            return null;
+
+        if (userEntity.getId() != instance.getUser().getId())
+            return null;
+
+        ExamEntity examEntity = instance.getExam();
+
+        List<QuestionEntity> questions = questionsService.getQuestionsForExam(examEntity);
+        return questions;
     }
 }

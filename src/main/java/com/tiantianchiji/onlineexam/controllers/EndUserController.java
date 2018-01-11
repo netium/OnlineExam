@@ -15,15 +15,15 @@ public class EndUserController {
     @Autowired
     EndUserService _service;
 
-    @RequestMapping(value = "{id}", method = RequestMethod.GET)
-    public JsonResponse<UserProfile> getUserProfile(@PathVariable Long id, @RequestParam(value = "userToken", defaultValue = "")String userToken) {
+    @RequestMapping(value = "profile", method = RequestMethod.GET)
+    public JsonResponse<UserProfile> getUserProfile(@RequestParam(value = "userToken", defaultValue = "")String userToken) {
         JsonResponse<UserProfile> response = new JsonResponse<>();
         response.setByHttpStatus(HttpStatus.OK);
         response.setMessage("");
-        UserEntity user = _service.getUserProfile(userToken, id);
+        UserEntity user = _service.getUserProfile(userToken);
         if (user == null) {
             response.setByHttpStatus(HttpStatus.NOT_FOUND);
-            response.setMessage("UserId: " + id.toString() + "was not found");
+            response.setMessage("User was not found");
             response.setBody(null);
         }
         else {

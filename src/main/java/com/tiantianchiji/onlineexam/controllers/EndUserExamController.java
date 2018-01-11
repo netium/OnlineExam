@@ -1,14 +1,16 @@
 package com.tiantianchiji.onlineexam.controllers;
 
-import com.tiantianchiji.onlineexam.dtos.Exam;
+import com.tiantianchiji.onlineexam.dtos.AskFormQuestion;
 import com.tiantianchiji.onlineexam.dtos.JsonResponse;
 import com.tiantianchiji.onlineexam.entities.ExamEntity;
+import com.tiantianchiji.onlineexam.entities.QuestionEntity;
 import com.tiantianchiji.onlineexam.services.EndUserExamService;
 import com.tiantianchiji.onlineexam.services.EndUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -34,13 +36,31 @@ public class EndUserExamController {
     }
 
     @RequestMapping(value="ongoingexams", method = RequestMethod.POST)
-    public long startExam(@RequestParam(value="userToken") String userToken, @RequestParam(value="examId") long examId) {
-        return -1;
+    public JsonResponse<Long> startExam(@RequestParam(value="userToken") String userToken, @RequestBody Long examId) {
+        long examInstanceId = _examService.createNewExamInstance(userToken, examId);
+        if (examInstanceId < 0) {
+            return new JsonResponse<Long>().fillStatus(HttpStatus.FORBIDDEN).fillMessage("Create exam failed!");
+        }
+        else {
+            return new JsonResponse<Long>().fillStatus(HttpStatus.CREATED).fillMessage("Create exam succeed!").fillBody(examInstanceId);
+        }
     }
 
-    @RequestMapping(value="ongoingexams/{examinstid}", method = RequestMethod.GET)
-    public Exam getQuestions(@RequestParam(value="userToken") String userToken, @PathVariable("examinstid") long examInstId) {
-        return null;
+    @RequestMapping(value="ongoingexams/{examinstid}/questions", method = RequestMethod.GET)
+    public JsonResponse<List<AskFormQuestion>> getOngoingExamQuestions(@RequestParam(value="userToken") String userToken, @PathVariable("examinstid") long examInstId) {
+
+        List<QuestionEntity> questions = _examService.getQuestionsForExamInstance(userToken, examInstId);
+        if (questions == null) {
+            return new JsonResponse<List<AskFormQuestion>>().fillStatus(HttpStatus.NOT_FOUND).fillMessage("Can not get questions").fillBody(null);
+        }
+        else {
+            List<AskFormQuestion> askFormQuestions = new ArrayList<AskFormQuestion>();
+            for (QuestionEntity entity : questions) {
+                askFormQuestions.add(AskFormQuestion.fromEntity(entity));
+            }
+
+            return new JsonResponse<List<AskFormQuestion>>().fillStatus(HttpStatus.OK).fillMessage("Question getting succeed").fillBody(askFormQuestions);
+        }
     }
 
     @RequestMapping(value="ongoingexams/{examinstid}", method = RequestMethod.PUT)
