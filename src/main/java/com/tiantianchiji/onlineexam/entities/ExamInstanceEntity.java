@@ -1,15 +1,37 @@
 package com.tiantianchiji.onlineexam.entities;
 
+import javax.persistence.*;
 import java.util.Date;
 
+@Entity(name = "examInstances")
+@Table(name = "examinstances")
 public class ExamInstanceEntity {
+    @Id
+    @GeneratedValue(strategy= GenerationType.AUTO)
+    @Column(name = "id")
     private long id;
-    private long userId;
-    private long examId;
+
+    @ManyToOne
+    @JoinColumn(name = "enduserid")
+    private UserEntity user;
+
+    @ManyToOne
+    @JoinColumn(name = "examid")
+    private ExamEntity exam;
+
+    @Column(name = "starttime")
     private Date startTime;
+
+    @Column(name = "endtime")
     private Date submitTime;
+
+    @Column(name = "status")
     private int  status;
+
+    @Column(name = "score")
     private int  score;
+
+    @Column(name = "answers")
     private String answers;
 
     public long getId() {
@@ -20,20 +42,20 @@ public class ExamInstanceEntity {
         this.id = id;
     }
 
-    public long getUserId() {
-        return userId;
+    public UserEntity getUser() {
+        return user;
     }
 
-    public void setUserId(long userId) {
-        this.userId = userId;
+    public void setUser(UserEntity user) {
+        this.user = user;
     }
 
-    public long getExamId() {
-        return examId;
+    public ExamEntity getExam() {
+        return exam;
     }
 
-    public void setExamId(long examId) {
-        this.examId = examId;
+    public void setExam(ExamEntity exam) {
+        this.exam = exam;
     }
 
     public Date getStartTime() {

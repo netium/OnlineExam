@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.security.*;
 import java.math.*;
+import java.util.UUID;
 
 @Service
 public class EndUserService {
@@ -64,14 +65,6 @@ public class EndUserService {
         return user;
     }
 
-    private UserEntity getUserByToken(String userToken) {
-        List<UserEntity> users = _repository.findByToken(userToken);
-        if (users.size() == 0)
-            return null;
-        else
-            return users.get(0);
-    }
-
     public String login(String username, String password) {
         List<UserEntity> users = _repository.findByUsername(username);
         if (users.size() == 0)
@@ -79,10 +72,30 @@ public class EndUserService {
         else {
             String hashedPassword = hashPassword(password);
             if (users.get(0).getPassword().equals(hashedPassword)) {
-                return users.get(0).getToken();
+                UserEntity user = users.get(0);
+                user.setToken(generateToken());
+                user = _repository.save(user);
+                return user.getToken();
             }
             return "";
         }
+    }
+
+    public void logout(String currentUserToken) {
+        List<UserEntity> users = _repository.findByToken(currentUserToken);
+        if (users.size() > 0) {
+            UserEntity user = users.get(0);
+            user.setToken("");
+            _repository.save(user);
+        }
+    }
+
+    private UserEntity getUserByToken(String userToken) {
+        List<UserEntity> users = _repository.findByToken(userToken);
+        if (users.size() == 0)
+            return null;
+        else
+            return users.get(0);
     }
 
 
@@ -99,5 +112,9 @@ public class EndUserService {
             _log.error(e.getStackTrace().toString());
         }
         return "";
+    }
+
+    private String generateToken() {
+        return UUID.randomUUID().toString();
     }
 }

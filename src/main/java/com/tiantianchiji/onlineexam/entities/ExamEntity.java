@@ -32,6 +32,9 @@ public class ExamEntity {
     @Column(name = "status")
     private int status;
 
+    @Column(name = "level")
+    private int level;
+
     public long getId() {
         return id;
     }
@@ -87,4 +90,8 @@ public class ExamEntity {
     public void setStatus(int status) {
         this.status = status;
     }
+
+    public int getLevel() { return level; }
+
+    public void setLevel(int level) { this.level = level; }
 }

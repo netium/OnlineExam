@@ -17,42 +17,34 @@ public class EndUserExamController {
     @Autowired
     EndUserExamService _examService;
 
-    @Autowired
-    EndUserService _userService;
-
-    @RequestMapping(value="{userid}/exams", method = RequestMethod.GET)
-    public JsonResponse<List<ExamEntity>> getApplicableExams(@PathVariable long userid, @RequestParam(value="userToken") String userToken) {
-
-        JsonResponse<List<ExamEntity>> response = new JsonResponse<List<ExamEntity>>();
-        response.setStatus(HttpStatus.OK);
-        response.setMessage("");
+    @RequestMapping(value="/exams", method = RequestMethod.GET)
+    public JsonResponse<List<ExamEntity>> getApplicableExams(@RequestParam(value="userToken") String userToken) {
         List<ExamEntity> exams = _examService.getAllApplicableExams(userToken);
-        response.setBody(exams);
-        return response;
+        return new JsonResponse<List<ExamEntity>>().fillStatus(HttpStatus.OK).fillMessage("").fillBody(exams);
     }
 
-    @RequestMapping(value="{userid}/examinsts", method = RequestMethod.GET)
-    public Object getAllExamInstances(@PathVariable long userid, @RequestParam(value="userToken") String userToken) {
+    @RequestMapping(value="examinsts", method = RequestMethod.GET)
+    public Object getAllExamInstances(@RequestParam(value="userToken") String userToken) {
         return null;
     }
 
-    @RequestMapping(value="{userid}/examinsts/{examinstid}", method = RequestMethod.GET)
-    public Object getExamReport(@PathVariable long userid, @RequestParam(value="userToken") String userToken, @PathVariable(value="examinstid") long examInstId) {
+    @RequestMapping(value="examinsts/{examinstid}", method = RequestMethod.GET)
+    public Object getExamReport(@RequestParam(value="userToken") String userToken, @PathVariable(value="examinstid") long examInstId) {
         return null;
     }
 
-    @RequestMapping(value="{userid}/ongoingexams", method = RequestMethod.POST)
-    public long startExam(@PathVariable long userid, @RequestParam(value="userToken") String userToken, @RequestParam(value="examId") long examId) {
+    @RequestMapping(value="ongoingexams", method = RequestMethod.POST)
+    public long startExam(@RequestParam(value="userToken") String userToken, @RequestParam(value="examId") long examId) {
         return -1;
     }
 
-    @RequestMapping(value="{userid}/ongoingexams/{examinstid}", method = RequestMethod.GET)
-    public Exam getQuestions(@PathVariable long userid, @RequestParam(value="userToken") String userToken, @PathVariable("examinstid") long examInstId) {
+    @RequestMapping(value="ongoingexams/{examinstid}", method = RequestMethod.GET)
+    public Exam getQuestions(@RequestParam(value="userToken") String userToken, @PathVariable("examinstid") long examInstId) {
         return null;
     }
 
-    @RequestMapping(value="{userid}/ongoingexams/{examinstid}", method = RequestMethod.PUT)
-    public long finishExam(@PathVariable long userid, @RequestParam(value="userToken") String userToken, @PathVariable("examinstid") long examInstId) {
+    @RequestMapping(value="ongoingexams/{examinstid}", method = RequestMethod.PUT)
+    public long finishExam(@RequestParam(value="userToken") String userToken, @PathVariable("examinstid") long examInstId) {
         return -1;
     }
 }

@@ -7,16 +7,20 @@ import java.io.Serializable;
 public class JsonResponse<BodyType> implements Serializable{
     private static final long _serialVersionUID = 1L;
 
-    private HttpStatus status;
+    private int status;
     private String message;
     private BodyType body;
 
-    public HttpStatus getStatus() {
+    public int getStatus() {
         return status;
     }
 
-    public void setStatus(HttpStatus status) {
+    public void setStatus(int status) {
         this.status = status;
+    }
+
+    public void setByHttpStatus(HttpStatus httpStatus) {
+        this.status = httpStatus.value();
     }
 
     public String getMessage() {
@@ -35,4 +39,18 @@ public class JsonResponse<BodyType> implements Serializable{
         this.body = body;
     }
 
+    public JsonResponse<BodyType> fillStatus(HttpStatus status) {
+        this.setByHttpStatus(status);
+        return this;
+    }
+
+    public JsonResponse<BodyType> fillMessage(String message) {
+        this.setMessage(message);
+        return this;
+    }
+
+    public JsonResponse<BodyType> fillBody(BodyType body) {
+        this.setBody(body);
+        return this;
+    }
 }
