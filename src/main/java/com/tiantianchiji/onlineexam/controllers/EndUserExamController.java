@@ -1,5 +1,6 @@
 package com.tiantianchiji.onlineexam.controllers;
 
+import com.tiantianchiji.onlineexam.dtos.Answer;
 import com.tiantianchiji.onlineexam.dtos.AskFormQuestion;
 import com.tiantianchiji.onlineexam.dtos.JsonResponse;
 import com.tiantianchiji.onlineexam.entities.ExamEntity;
@@ -64,7 +65,27 @@ public class EndUserExamController {
     }
 
     @RequestMapping(value="ongoingexams/{examinstid}", method = RequestMethod.PUT)
-    public long finishExam(@RequestParam(value="userToken") String userToken, @PathVariable("examinstid") long examInstId) {
-        return -1;
+    public JsonResponse<Void> finishExam(@RequestParam(value="userToken") String userToken, @PathVariable("examinstid") long examInstId, @RequestBody Answer[] answers) {
+        int ret = _examService.submitExam(userToken, examInstId, answers);
+        JsonResponse<Void> response = new JsonResponse<Void>();
+        switch (ret) {
+            case -1:
+                response.fillStatus(HttpStatus.UNAUTHORIZED);
+                break;
+            case -2:
+                response.fillStatus(HttpStatus.NOT_FOUND);
+                break;
+            case -3:
+                response.fillStatus(HttpStatus.FORBIDDEN);
+                break;
+            case -4:
+                response.fillStatus(HttpStatus.FORBIDDEN);
+                break;
+            default:
+                response.fillStatus(HttpStatus.OK);
+                break;
+        }
+        response.fillMessage("").fillBody(null);
+        return response;
     }
 }

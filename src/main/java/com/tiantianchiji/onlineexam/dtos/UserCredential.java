@@ -3,7 +3,7 @@ package com.tiantianchiji.onlineexam.dtos;
 import java.io.Serializable;
 
 public class UserCredential implements Serializable {
-    private static final long _serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
     private String username;
     private String password;
 

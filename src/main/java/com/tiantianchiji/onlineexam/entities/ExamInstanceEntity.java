@@ -70,7 +70,7 @@ public class ExamInstanceEntity {
         return submitTime;
     }
 
-    public void setSubmitTime() {
+    public void setSubmitTime(Date submitTime) {
         this.submitTime = submitTime;
     }
 

@@ -1,6 +1,8 @@
 package com.tiantianchiji.onlineexam.services;
 
-import com.tiantianchiji.onlineexam.dtos.Question;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tiantianchiji.onlineexam.dtos.Answer;
 import com.tiantianchiji.onlineexam.entities.ExamEntity;
 import com.tiantianchiji.onlineexam.entities.ExamInstanceEntity;
 import com.tiantianchiji.onlineexam.entities.QuestionEntity;
@@ -10,8 +12,7 @@ import com.tiantianchiji.onlineexam.repositories.EndUserExamRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class EndUserExamService {
@@ -76,5 +77,52 @@ public class EndUserExamService {
 
         List<QuestionEntity> questions = questionsService.getQuestionsForExam(examEntity);
         return questions;
+    }
+
+    public int submitExam(String userToken, long examInstanceId, Answer[] anwers) {
+        UserEntity userEntity = endUserService.getUserProfile(userToken);
+        if (userEntity == null)
+            return -1;
+
+        ExamInstanceEntity instance = examInstanceRepository.findOne(examInstanceId);
+        if (instance == null)
+            return -2;
+
+        if (instance.getUser().getId() != userEntity.getId())
+            return -3;
+
+        if (instance.getStatus() != 0)
+            return -4;
+
+        ExamEntity examEntity = instance.getExam();
+
+        List<QuestionEntity> questions = questionsService.getQuestionsForExam(examEntity);
+
+        int totalScore = 0;
+        Queue<QuestionEntity> questionsQueue = new ArrayDeque<QuestionEntity>();
+        questionsQueue.addAll(questions);
+        while (questionsQueue.size() != 0) {
+            QuestionEntity entity = questionsQueue.poll();
+            for (Answer answer : anwers) {
+                if (entity.getId() == answer.getId() && entity.getAnswer().equals(answer.getAnswer())) {
+                    totalScore += entity.getPoints();
+                }
+            }
+        }
+
+        instance.setScore(totalScore);
+        instance.setStatus(1);
+        instance.setSubmitTime(new Date());
+
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            String answersJsonString = mapper.writeValueAsString(anwers);
+            instance.setAnswers(answersJsonString);
+        } catch (JsonProcessingException e) {
+            instance.setAnswers("");
+        }
+        examInstanceRepository.save(instance);
+
+        return 0;
     }
 }
