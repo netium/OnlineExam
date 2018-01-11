@@ -11,15 +11,17 @@ import com.tiantianchiji.onlineexam.entities.QuestionEntity;
 import com.tiantianchiji.onlineexam.entities.UserEntity;
 import com.tiantianchiji.onlineexam.repositories.EndUserExamInstanceRepository;
 import com.tiantianchiji.onlineexam.repositories.EndUserExamRepository;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.time.Duration;
 import java.util.*;
 
 @Service
 public class EndUserExamService {
+    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(EndUserExamService.class);
+
     @Autowired
     EndUserExamRepository examRepository;
 
@@ -124,6 +126,7 @@ public class EndUserExamService {
             instance.setAnswers(answersJsonString);
         } catch (JsonProcessingException e) {
             instance.setAnswers("");
+            logger.error("Cannot convert Answer[] to JSON string", e);
         }
         examInstanceRepository.save(instance);
 
@@ -185,6 +188,7 @@ public class EndUserExamService {
             }
         }
         catch (IOException e) {
+            logger.error("Cannot construct Answer[] from JSON string: " + instance.getAnswers(), e);
         }
 
         report.setQuestionFeedback(questionFeedbacks);
