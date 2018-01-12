@@ -4,15 +4,15 @@ pipeline {
     }
 
     stages {
-        stage('Build') {
+        stage('Test') {
             steps {
                 sh 'mvn test'
             }
 
         }
-        stage('Test') {
+        stage('Build') {
             steps {
-                echo 'Testing..'
+                echo 'build..'
             }
         }
         stage('Deploy') {
