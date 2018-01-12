@@ -1,3 +1,5 @@
+package com.tiantianchiji.onlineexam;
+
 import com.tiantianchiji.onlineexam.entities.ExamEntity;
 import org.junit.Test;
 import static org.junit.Assert.assertEquals;
