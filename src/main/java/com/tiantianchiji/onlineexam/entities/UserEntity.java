@@ -3,7 +3,7 @@ package com.tiantianchiji.onlineexam.entities;
 import javax.persistence.*;
 import java.io.Serializable;
 
-@Entity
+@Entity(name="users")
 @Table(name = "endusers")
 public class UserEntity implements Serializable {
     private static final long _serialVersionUID = 1L;

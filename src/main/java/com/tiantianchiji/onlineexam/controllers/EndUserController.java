@@ -40,7 +40,7 @@ public class EndUserController {
         return id;
     }
 
-    @RequestMapping(value = "login", method = RequestMethod.POST)
+    @RequestMapping(value = "tokens", method = RequestMethod.POST)
     public JsonResponse<String> login(@RequestBody UserCredential userCredential) {
         String token = _service.login(userCredential.getUsername(), userCredential.getPassword());
         if (token == null || token.length() == 0) {
@@ -51,7 +51,7 @@ public class EndUserController {
         }
     }
 
-    @RequestMapping(value = "logout", method = RequestMethod.PUT)
+    @RequestMapping(value = "tokens", method = RequestMethod.DELETE)
     public JsonResponse<String> logout(@RequestParam(value="userToken")String userToken) {
         _service.logout(userToken);
         return new JsonResponse<String>().fillStatus(HttpStatus.NO_CONTENT).fillMessage("Logout success!").fillBody("");
